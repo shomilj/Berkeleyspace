@@ -2,7 +2,7 @@ import { UPDATE_SEARCH, SELECT_POST } from "./actionTypes";
 
 export const updateSearch = filters => {
     return (dispatch) => {
-        fetch('/query', {method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(filters)})
+        fetch('http://localhost:8080/query', {method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(filters)})
         .then(data => data.json())
         .then(data => {
             dispatch({
@@ -15,7 +15,7 @@ export const updateSearch = filters => {
 
 export const selectPost = id => {
     return (dispatch) => {
-        fetch('/content', {method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({'id': id})})
+        fetch('http://localhost:8080/content', {method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({'id': id})})
         .then(data => data.json())
         .then(content => {
             dispatch({

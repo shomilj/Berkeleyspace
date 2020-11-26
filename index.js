@@ -1,8 +1,13 @@
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 8080;
+
 /* Fuse is our fuzzy searching API. */
 const Fuse = require('fuse.js')
+
+/* We apply some list preprocessing if we're using 'auto' search and we detect a keyword. */
+const metadata = require('./metadata.json');
+const coursemap = metadata.coursemap;
 
 var dataset = require('./dump.json');
 dataset = dataset.filter((row) => {
@@ -23,8 +28,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 /* A helper function to filter on data. */
-function filterData(data, courses, professors, tags) {
+function filterData(data, question, courses, professors, tags) {
   var results = [];
+
+  /* Grab any classes that are in the question and stick them into the course query list. */
+  var parts = question.split(' ');
+  for (var i = 0; i < parts.length; i++) {
+    var part = parts[i].toUpperCase();
+    var entry = coursemap[part];
+    if (entry != null && !courses.includes(entry)) courses.push(entry);
+  }
+
   for (var i = 0; i < data.length; i++) {
     var row = data[i];
     /* Ensure that _all_ criteria match (e.g. if user has selected cs189, cs182, and sahai, all of those must match exactly). */
@@ -153,7 +167,7 @@ app.post('/query', (req, res) => {
   }
 
   /* Then, filter data on courses, professors, and tags. */
-  data = filterData(data, courses, professors, tags);
+  data = filterData(data, question, courses, professors, tags);
 
   /* Then, apply our sort. */
   switch(sort) {
