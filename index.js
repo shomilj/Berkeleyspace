@@ -122,7 +122,7 @@ app.post('/query', (req, res) => {
   var tags = req.body.tags || [];
   if (typeof tags == 'string' && tags != '') tags = [tags];
 
-  console.log('Question: ' + question + '; Mode: ' + mode + '; Sort: ' + sort + '; Courses: ' + courses + '; Professors: ' + professors + '; Tags: ' + tags);
+  // console.log('Question: ' + question + '; Mode: ' + mode + '; Sort: ' + sort + '; Courses: ' + courses + '; Professors: ' + professors + '; Tags: ' + tags);
   
   /* If no filters were applied and the search query is empty, return an empty dictionary. */
   if (question == '' && (courses.length + professors.length + tags.length == 0)) {

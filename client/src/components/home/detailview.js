@@ -1,102 +1,160 @@
-import * as React from 'react';
-import { Navbar, Nav, Row, Col, Card, Badge, Container, Form, Button } from 'react-bootstrap';
-import Cell from './cell';
+import * as React from "react";
+import { Row, Col, Card, Badge } from "react-bootstrap";
 import { connect } from "react-redux";
-import { getSelectedPost } from "../../redux/selectors";
+import { getSelectedPost, isLoadingDetail } from "../../redux/selectors";
+import * as Spinner from "react-spinkit";
 
+/* The DetailView component is the component that displays detailed information about a post,
+    including the post content and followups. */
 class DetailView extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.selectedPost = null;
-    }
+  constructor(props) {
+    super(props);
+    this.selectedPost = null;
+    this.loadingDetail = true;
+  }
 
-    emptyPage = () => {
-        return 'Empty page.'
-    }
+  emptyPage = () => {
+    return "Empty page.";
+  };
 
-    postPage = () => {
-        return (
-            <div>
-                <Row className="m-1">
-                <h3 dangerouslySetInnerHTML={{__html: this.props.selectedPost.title}}></h3></Row>
+  postPage = () => {
+    return (
+      <div>
+        {this.props.loadingDetail ? (
+          <div style={{ height: "1005" }} className="justify-content-md-center">
+            <Spinner name="ball-beat" />
+          </div>
+        ) : (
+          <div>
             <Row className="m-1">
-                {this.props.selectedPost.courses ? this.props.selectedPost.courses.map((child) => {
-                    return (
-                        <Badge className="m-1" variant="info">{child}</Badge>
-                    )
-                }) : ''}
-                {this.props.selectedPost.professors ? this.props.selectedPost.professors.map((child) => {
-                    return (
-                        <Badge className="m-1" variant="success">{child}</Badge>
-                    )
-                }) : ''}
-                {this.props.selectedPost.tags ? this.props.selectedPost.tags.map((child) => {
-                    return (
-                        <Badge className="m-1" variant="warning">{child}</Badge>
-                    )
-                }) : ''}
+              <h3
+                dangerouslySetInnerHTML={{
+                  __html: this.props.selectedPost.title,
+                }}
+              ></h3>
             </Row>
             <Row className="m-1">
-                {this.props.selectedPost.date ? <p className="m-1" style={{color: 'lightgray', fontSize: "14px"}}>Posted on {new Date(this.props.selectedPost.date).toLocaleDateString("en-US")}.</p> : ''}
+              {this.props.selectedPost.courses
+                ? this.props.selectedPost.courses.map((child) => {
+                    return (
+                      <Badge className="m-1" variant="info">
+                        {child}
+                      </Badge>
+                    );
+                  })
+                : ""}
+              {this.props.selectedPost.professors
+                ? this.props.selectedPost.professors.map((child) => {
+                    return (
+                      <Badge className="m-1" variant="success">
+                        {child}
+                      </Badge>
+                    );
+                  })
+                : ""}
+              {this.props.selectedPost.tags
+                ? this.props.selectedPost.tags.map((child) => {
+                    return (
+                      <Badge className="m-1" variant="warning">
+                        {child}
+                      </Badge>
+                    );
+                  })
+                : ""}
+            </Row>
+            <Row className="m-1">
+              {this.props.selectedPost.date ? (
+                <p
+                  className="m-1"
+                  style={{ color: "lightgray", fontSize: "14px" }}
+                >
+                  Posted on{" "}
+                  {new Date(this.props.selectedPost.date).toLocaleDateString(
+                    "en-US"
+                  )}
+                  .
+                </p>
+              ) : (
+                ""
+              )}
             </Row>
             <Row className="mt-4 m-2">
-                <p dangerouslySetInnerHTML={{__html: this.props.selectedPost.content}} style={{fontSize: "14px"}}>
-                    
-                </p>
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: this.props.selectedPost.content,
+                }}
+                style={{ fontSize: "14px" }}
+              ></p>
             </Row>
-            
-            {
-                this.props.selectedPost.children ?
-                this.props.selectedPost.children.map((child) => {
-                    return (
-                        <Card className="my-2" style={{width: "100%", borderColor: "#ededed"}}>
-                            <div className="m-2">
-                                <p className="m-1" dangerouslySetInnerHTML={{__html: child.content}} style={{fontSize: "14px"}}>
-                                </p>
-                                <p className="mx-1 my-2" style={{fontSize: "10px", color: "gray"}}>
-                                    {child.date}
-                                </p>
-                                {child.children.map((followup) => {
-                                    return (
-                                        <Card className="my-2" style={{width: "100%", borderColor: "#ededed"}}>
-                                            <div className="m-2">
-                                                <p dangerouslySetInnerHTML={{__html: followup.content}} className="m-1" style={{fontSize: "14px"}}>
-                                                </p>
-                                                <p className="mx-1 my-2" style={{fontSize: "10px", color: "gray"}}>
-                                                    {followup.date}
-                                                </p>
-                                            </div>
-                                        </Card>
-                                    )
-                                })}
-                            </div>
-                        </Card>
-                    )
-                }) : ''
-            }
-            </div>
-        )
-    }
 
-    render() {
-        return (
-            <Col className="m-1" style={{overflowY: "auto", height: "90vh"}}>
-                {this.props.selectedPost ? this.postPage() : this.emptyPage()
-                }
-            </Col>
-        );
-    }
+            {this.props.selectedPost.children
+              ? this.props.selectedPost.children.map((child) => {
+                  return (
+                    <Card
+                      className="my-2"
+                      style={{ width: "100%", borderColor: "#ededed" }}
+                    >
+                      <div className="m-2">
+                        <p
+                          className="m-1"
+                          dangerouslySetInnerHTML={{ __html: child.content }}
+                          style={{ fontSize: "14px" }}
+                        ></p>
+                        <p
+                          className="mx-1 my-2"
+                          style={{ fontSize: "10px", color: "gray" }}
+                        >
+                          {child.date}
+                        </p>
+                        {child.children.map((followup) => {
+                          return (
+                            <Card
+                              className="my-2"
+                              style={{ width: "100%", borderColor: "#ededed" }}
+                            >
+                              <div className="m-2">
+                                <p
+                                  dangerouslySetInnerHTML={{
+                                    __html: followup.content,
+                                  }}
+                                  className="m-1"
+                                  style={{ fontSize: "14px" }}
+                                ></p>
+                                <p
+                                  className="mx-1 my-2"
+                                  style={{ fontSize: "10px", color: "gray" }}
+                                >
+                                  {followup.date}
+                                </p>
+                              </div>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    </Card>
+                  );
+                })
+              : ""}
+          </div>
+        )}
+      </div>
+    );
+  };
 
+  render() {
+    return (
+      <Col className="m-1" style={{ overflowY: "auto", height: "90vh" }}>
+        {this.props.selectedPost ? this.postPage() : this.emptyPage()}
+      </Col>
+    );
+  }
 }
 
-const mapStateToProps = state => {
-    // const posts = getPosts(state);
-    // return { posts };
-    const selectedPost = getSelectedPost(state);
-    return {selectedPost};
+const mapStateToProps = (state) => {
+  const selectedPost = getSelectedPost(state);
+  const loadingDetail = isLoadingDetail(state);
+  return { selectedPost: selectedPost, loadingDetail: loadingDetail };
 };
 
-export default connect(
-    mapStateToProps
-)(DetailView);
+export default connect(mapStateToProps)(DetailView);
