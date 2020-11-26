@@ -72,30 +72,6 @@ class FilterBox extends React.Component {
   enteredSearchTerm = (e) => {
     if (e.keyCode == 13) {
       this.props.updateSearch(this.state)
-      // var query = []
-      // var parts = this.state.question.split(' ');
-      // var coursesToAdd = [];
-      // for (var i = 0; i < parts.length; i++) {
-      //   var part = parts[i];
-      //   if (coursemap[part.toLowerCase()] != null) {
-      //     if (i > 0 && ['cs', 'ee', 'eecs'].includes(parts[i-1].toLowerCase())) {
-      //       query[i-1] = ''
-      //     };
-      //     coursesToAdd.push(coursemap[part.toLowerCase()]);
-      //   } else {
-      //     query.push(part);
-      //   }
-      // }
-      // var existingCourses = this.state.courses;
-      // for (var i = 0; i < coursesToAdd; i++) {
-      //   if (!existingCourses.includes(coursesToAdd[i])) {
-      //     existingCourses.push(coursesToAdd[i]);
-      //   }
-      // }
-      // console.log('Courses: ' + existingCourses);
-      // this.setState({question: query.join(' '), courses: existingCourses}, () => {
-      //   this.props.updateSearch(this.state)
-      // });
     }
   }
 

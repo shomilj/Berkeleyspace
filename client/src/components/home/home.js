@@ -5,15 +5,6 @@ import ListView from './listview.js'
 import DetailView from './detailview.js'
 import { Row, Container } from 'react-bootstrap';
 
-/*
-React Architecture:
-
-NavBar => Component
-Filters => Component
-CardList => Component
-CardView => Component
-*/
-
 export default function Home() {
     return (
         <div>
