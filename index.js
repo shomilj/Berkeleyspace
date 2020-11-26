@@ -1,29 +1,16 @@
+/* This file contains the lightweight Express/NodeJS backend for https://eecs101.org/. */
+
 const express = require('express');
 const app = express();
 
-/* Redirect http to https. */
+/* Heroku uses process.env.PORT */
+const port = process.env.PORT || 8080;
+
+/* TODO: Implement SSL/HTTPS redirection. */
 // var sslRedirect = require('heroku-ssl-redirect');
 // app.use(sslRedirect());
 
-const port = process.env.PORT || 8080;
-
-/* Fuse is our fuzzy searching API. */
-const Fuse = require('fuse.js')
-
-/* We apply some list preprocessing if we're using 'auto' search and we detect a keyword. */
-const metadata = require('./metadata.json');
-const coursemap = metadata.coursemap;
-
-var dataset = require('./dump.json');
-dataset = dataset.filter((row) => {
-  return (row.children.length > 0);
-})
-
-const fuse = new Fuse(dataset, {
-  keys: ['searchContent']
-})
-
-/* Add CORS for debugging. */
+/* Add CORS. */
 var cors = require('cors')
 app.use(cors())
 
@@ -32,29 +19,49 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+/* Import metadata.json for the course map (it's used for preprocessing the search query). */
+const metadata = require('./metadata.json');
+const coursemap = metadata.coursemap;
+
+/* Import dump.json for the cached Piazza dataset. Filter to only posts with at least one response. */
+var dataset = require('./dump.json');
+dataset = dataset.filter((row) => { return (row.children.length > 0); })
+
+/* Fuse is our fuzzy searching API. */
+const Fuse = require('fuse.js')
+const fuse = new Fuse(dataset, {
+  keys: ['searchContent']
+})
+
+/* -------------- SECTION: Filtering Methods ----------------- */
+
 /* A helper function to filter on data. */
 function filterData(data, question, courses, professors, tags, isAuto) {
   var results = [];
 
-
-  /* For AUTO, grab any classes that are in the question and stick them into the course query list. */
+  /* For 'auto' search mode, we perform query preprocessing to extract classes and keywords 
+      from the search query. We add a special case for when we see the keyword "workload" */
   var filterOnWorkload = false;
   if (isAuto) {
     var parts = question.split(' ');
-    if (parts.includes('workload')) {
-      filterOnWorkload = true;
-    }
+    
+    /* Iterate through each word in the search query, looking for courses. */
     for (var i = 0; i < parts.length; i++) {
       var part = parts[i].toUpperCase();
       var entry = coursemap[part];
       if (entry != null && !courses.includes(entry)) courses.push(entry);
     }
+
+    /* Special flag for when we're searching for 'workload' */
+    if (parts.includes('workload')) filterOnWorkload = true;
   }
 
+  /* Perform strict filter matching. */
   for (var i = 0; i < data.length; i++) {
     var row = data[i];
-    /* Ensure that _all_ criteria match (e.g. if user has selected cs189, cs182, and sahai, all of those must match exactly). */
     var skip = false;
+
+    /* Filter on courses. */
     for (var j = 0; j < courses.length; j++) {
       var course = courses[j];
       if (row.courses == null || !row.courses.includes(course)) {
@@ -64,10 +71,12 @@ function filterData(data, question, courses, professors, tags, isAuto) {
     }
     if (skip) continue;
 
+    /* Filter on workload. */
     if (filterOnWorkload && !row.searchContent.includes('workload')) {
       continue;
     }
-  
+    
+    /* Filter on tags. */
     for (var j = 0; j < tags.length; j++) {
       var tag = tags[j];
       if (row.tags == null || !row.tags.includes(tag)) {
@@ -77,6 +86,7 @@ function filterData(data, question, courses, professors, tags, isAuto) {
     }
     if (skip) continue;
 
+    /* Filter on professors. */
     for (var j = 0; j < professors.length; j++) {
       var professor = professors[j];
       if (row.professors == null || !row.professors.includes(professor)) {
@@ -86,6 +96,7 @@ function filterData(data, question, courses, professors, tags, isAuto) {
     }
     if (skip) continue;
 
+    /* Our filtering is complete; push a stripped-down version of the row. */
     results.push(rowMetadata(row));
   }
   return results;
@@ -100,12 +111,14 @@ function rowMetadata(row) {
   }
 }
 
-/* Search methods. */
+/* -------------- SECTION: Search Methods ----------------- */
+
 function searchFuzzy(question) {
   return fuse.search(question).map((row) => row.item);
 }
 
 function searchRegex(question) {
+  /* TODO: Improve regex search (this is buggy and not currently implemented) */
   var regex = new RegExp(question);
   return dataset.filter((row) => {
     return (row.searchContent.toLowerCase().search(regex) != -1);
@@ -124,6 +137,9 @@ function searchTitle(question) {
   })
 }
 
+/* -------------- SECTION: Routing ----------------- */
+
+/* Returns post content for a given post. */
 app.post('/content', (req, res) => {
   var id = req.body.id || '';
   if (id != '') {
@@ -136,6 +152,7 @@ app.post('/content', (req, res) => {
   }
 })
 
+/* Returns a list of applicable posts' metadata. */
 app.post('/query', (req, res) => {
 
   /* First, we unwrap and null-check all parameters, setting default values as we go. */
@@ -151,8 +168,6 @@ app.post('/query', (req, res) => {
   if (typeof professors == 'string' && professors != '') professors = [professors];
   var tags = req.body.tags || [];
   if (typeof tags == 'string' && tags != '') tags = [tags];
-
-  // console.log('Question: ' + question + '; Mode: ' + mode + '; Sort: ' + sort + '; Courses: ' + courses + '; Professors: ' + professors + '; Tags: ' + tags);
   
   /* If no filters were applied and the search query is empty, return an empty dictionary. */
   if (question == '' && (courses.length + professors.length + tags.length == 0)) {
@@ -160,9 +175,9 @@ app.post('/query', (req, res) => {
     return;
   }
 
+  /* First, apply our search method. */
   var data = [];
   var isAuto = false;
-  /* First, apply our search method. */
   if (question != '') {
     switch (mode) {
       case 'auto':
