@@ -110,25 +110,25 @@ class FilterBox extends React.Component {
           </Row>
           <Row className="my-4">
             <div style={{minWidth: "100%"}}>
-              <h6>Search Type</h6>
+              <h6 className="my-1">Search Type</h6>
               <Select options={SEARCH_TYPES} onChange={e => this.updateMode(e)} value={SEARCH_TYPES.filter((t) => t.value == this.state.mode)}/>
             </div>
           </Row>
           <Row className="my-4">
             <div style={{minWidth: "100%"}}>
-              <h6>Sort By</h6>
+              <h6 className="my-1">Sort By</h6>
               <Select options={SORT_TYPES} onChange={e => this.updateSort(e)} value={SORT_TYPES.filter((t) => t.value == this.state.sort)}/>
             </div>
           </Row>
           <Row className="my-4">
             <div style={{minWidth: "100%"}}>
-              <h6>Courses</h6>
+              <h6 className="my-1">Courses</h6>
               <Select isClearable isMulti options={courses} onChange={e => this.updateCourses(e ? e.map(x => x.value) : [])} value={courses.filter((t) => this.state.courses.includes(t.value))} placeholder="Filter by course." />
             </div>
           </Row>
           <Row className="my-4">
             <div style={{minWidth: "100%"}}>
-              <h6>Professors</h6>
+              <h6 className="my-1">Professors</h6>
               <Select isClearable isMulti options={professors} onChange={e => this.updateProfessors(e ? e.map(x => x.value) : [])} placeholder="Filter by professor." />
             </div>
           </Row>
