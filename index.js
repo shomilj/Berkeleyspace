@@ -38,8 +38,12 @@ function filterData(data, question, courses, professors, tags, isAuto) {
 
 
   /* For AUTO, grab any classes that are in the question and stick them into the course query list. */
+  var filterOnWorkload = false;
   if (isAuto) {
     var parts = question.split(' ');
+    if (parts.includes('workload')) {
+      filterOnWorkload = true;
+    }
     for (var i = 0; i < parts.length; i++) {
       var part = parts[i].toUpperCase();
       var entry = coursemap[part];
@@ -59,6 +63,10 @@ function filterData(data, question, courses, professors, tags, isAuto) {
       }
     }
     if (skip) continue;
+
+    if (filterOnWorkload && !row.searchContent.includes('workload')) {
+      continue;
+    }
   
     for (var j = 0; j < tags.length; j++) {
       var tag = tags[j];
