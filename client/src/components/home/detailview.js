@@ -122,7 +122,9 @@ class DetailView extends React.Component {
                                   className="mx-1 my-2"
                                   style={{ fontSize: "10px", color: "gray" }}
                                 >
-                                  {followup.date}
+                                  {new Date(followup.date).toLocaleDateString(
+                                    "en-US"
+                                  )}
                                 </p>
                               </div>
                             </Card>
