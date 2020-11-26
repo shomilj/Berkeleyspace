@@ -1,8 +1,7 @@
 import * as React from "react";
 import { Row, Col, Card, Badge } from "react-bootstrap";
 import { connect } from "react-redux";
-import { getSelectedPost, isLoadingDetail } from "../../redux/selectors";
-import * as Spinner from "react-spinkit";
+import { getSelectedPost } from "../../redux/selectors";
 
 /* The DetailView component is the component that displays detailed information about a post,
     including the post content and followups. */
@@ -11,7 +10,6 @@ class DetailView extends React.Component {
   constructor(props) {
     super(props);
     this.selectedPost = null;
-    this.loadingDetail = true;
   }
 
   emptyPage = () => {
@@ -23,7 +21,6 @@ class DetailView extends React.Component {
       <div>
         {this.props.loadingDetail ? (
           <div style={{ height: "1005" }} className="justify-content-md-center">
-            <Spinner name="ball-beat" />
           </div>
         ) : (
           <div>
@@ -153,8 +150,7 @@ class DetailView extends React.Component {
 
 const mapStateToProps = (state) => {
   const selectedPost = getSelectedPost(state);
-  const loadingDetail = isLoadingDetail(state);
-  return { selectedPost: selectedPost, loadingDetail: loadingDetail };
+  return { selectedPost: selectedPost };
 };
 
 export default connect(mapStateToProps)(DetailView);

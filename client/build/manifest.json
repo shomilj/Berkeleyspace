@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "EECS 101",
+  "name": "Berkeley's advising hub for EECS students.",
   "icons": [
     {
       "src": "favicon.ico",
