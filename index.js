@@ -1,5 +1,10 @@
 const express = require('express');
 const app = express();
+
+/* Redirect http to https. */
+import sslRedirect from 'heroku-ssl-redirect';
+app.use(sslRedirect());
+
 const port = process.env.PORT || 8080;
 
 /* Fuse is our fuzzy searching API. */
