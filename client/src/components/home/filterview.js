@@ -8,12 +8,13 @@ import Select from 'react-select'
 const SEARCH_TYPES = [
   { value: 'auto', label: 'Auto'},
   { value: 'exact', label: 'Exact'},
+  { value: 'fuzzy', label: 'Fuzzy'},
   { value: 'title', label: 'Title Only'}
 ]
 
 const SORT_TYPES = [
-  { value: 'auto', label: 'Auto'},
-  { value: 'date', label: 'Date'}
+  {value: 'auto', label: 'Auto'},
+  {value: 'date', label: 'Date'},
 ]
 
 const metadata = require('../../metadata.json');

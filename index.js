@@ -28,15 +28,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 /* A helper function to filter on data. */
-function filterData(data, question, courses, professors, tags) {
+function filterData(data, question, courses, professors, tags, isAuto) {
   var results = [];
 
-  /* Grab any classes that are in the question and stick them into the course query list. */
-  var parts = question.split(' ');
-  for (var i = 0; i < parts.length; i++) {
-    var part = parts[i].toUpperCase();
-    var entry = coursemap[part];
-    if (entry != null && !courses.includes(entry)) courses.push(entry);
+
+  /* For AUTO, grab any classes that are in the question and stick them into the course query list. */
+  if (isAuto) {
+    var parts = question.split(' ');
+    for (var i = 0; i < parts.length; i++) {
+      var part = parts[i].toUpperCase();
+      var entry = coursemap[part];
+      if (entry != null && !courses.includes(entry)) courses.push(entry);
+    }
   }
 
   for (var i = 0; i < data.length; i++) {
@@ -145,11 +148,15 @@ app.post('/query', (req, res) => {
   }
 
   var data = [];
-
+  var isAuto = false;
   /* First, apply our search method. */
   if (question != '') {
     switch (mode) {
       case 'auto':
+        data = searchFuzzy(question);
+        isAuto = true;
+        break;
+      case 'fuzzy':
         data = searchFuzzy(question);
         break;
       case 'regex':
@@ -167,7 +174,7 @@ app.post('/query', (req, res) => {
   }
 
   /* Then, filter data on courses, professors, and tags. */
-  data = filterData(data, question, courses, professors, tags);
+  data = filterData(data, question, courses, professors, tags, isAuto);
 
   /* Then, apply our sort. */
   switch(sort) {
