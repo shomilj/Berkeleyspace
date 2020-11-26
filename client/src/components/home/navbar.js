@@ -8,7 +8,7 @@ export default function NavigationBar() {
             <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ml-auto">
                 <Nav.Link className="bt-bold nav-link" href="/">Home</Nav.Link>
-                <Nav.Link className="bt-bold nav-link" href="/about">About</Nav.Link>
+                {/* <Nav.Link className="bt-bold nav-link" href="/about">About</Nav.Link> */}
             </Nav>
             </Navbar.Collapse>
         </Navbar>
