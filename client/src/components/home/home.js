@@ -3,7 +3,7 @@ import NavigationBar from './navbar.js'
 import FilterView from './filterview.js'
 import ListView from './listview.js'
 import DetailView from './detailview.js'
-import { Navbar, Nav, Row, Col, Card, Badge, Container, Form, Button } from 'react-bootstrap';
+import { Row, Container } from 'react-bootstrap';
 
 /*
 React Architecture:

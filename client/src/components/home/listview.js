@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Navbar, Nav, Col, Card, Badge, Container, Form, Button } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 import Cell from './cell';
 import { connect } from "react-redux";
 import { getPosts } from "../../redux/selectors";
@@ -7,10 +7,6 @@ import { getPosts } from "../../redux/selectors";
 import { selectPost } from "../../redux/actions";
 
 class ListView extends React.Component {
-
-    constructor(props) {
-        super(props);
-    }
 
     didSelectPost = (id) => {
         var x = () => {

@@ -1,7 +1,9 @@
 
-import { Navbar, Nav, Row, Col, Card, Badge, Container, Form, Button } from 'react-bootstrap';import { connect } from "react-redux";
+import { Row, Col, Form } from 'react-bootstrap';
+import { connect } from "react-redux";
 import { updateSearch } from "../../redux/actions";
 
+import ReactGA from 'react-ga';
 import * as React from 'react';
 import Select from 'react-select'
 
@@ -24,19 +26,18 @@ const courses = metadata.courses.map((course) => {
 const professors = metadata.profs.map((prof) => {
   return {value: prof, label: prof}
 });
-const coursemap = metadata.coursemap;
-
-const tags = [
-  { value: 'workload', label: 'workload' },
-  { value: 'scheduling', label: 'scheduling' }
-]
 
 class FilterBox extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = { question: [], mode: 'auto', sort: 'auto', courses: [], professors: [], tags: [] }
   }
   
+  componentDidMount() {
+    ReactGA.pageview(window.location.pathname + window.location.search);
+  }
+
   updateQuestion = question => {
     this.setState({question: question}, () => {
       // this.props.updateSearch(this.state)

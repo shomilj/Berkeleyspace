@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Navbar, Nav, Row, Col, Card, Badge, Container, Form, Button } from 'react-bootstrap';
 
 export default function Cell(props) {
     return (
