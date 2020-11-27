@@ -19,6 +19,11 @@ const SORT_TYPES = [
   {value: 'date', label: 'Date'},
 ]
 
+const SOURCE_TYPES = [
+  { value: 'piazza', label: 'Piazza' },
+  { value: 'reddit', label: 'Reddit'}
+]
+
 const metadata = require('../../metadata.json');
 const courses = metadata.courses.map((course) => {
   return {value: course, label: course}
@@ -31,7 +36,7 @@ class FilterBox extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { question: [], mode: 'auto', sort: 'auto', courses: [], professors: [], tags: [] }
+    this.state = { question: [], mode: 'auto', sort: 'auto', courses: [], source: 'piazza', professors: [], tags: [] }
   }
   
   componentDidMount() {
@@ -63,6 +68,11 @@ class FilterBox extends React.Component {
       this.props.updateSearch(this.state)
     })
   }
+  updateSource = source => {
+    this.setState({source: source.value}, () => {
+      this.props.updateSearch(this.state)
+    })
+  }
   updateTags = tags => {
     this.setState({tags: tags}, () => {
       this.props.updateSearch(this.state)
@@ -74,7 +84,6 @@ class FilterBox extends React.Component {
       this.props.updateSearch(this.state)
     }
   }
-
 
   render() {
     return (
@@ -110,12 +119,12 @@ class FilterBox extends React.Component {
               <Select isClearable isMulti options={professors} onChange={e => this.updateProfessors(e ? e.map(x => x.value) : [])} placeholder="Filter by professor." />
             </div>
           </Row>
-          {/* <Row className="my-4">
-            <h6>Tags</h6>
+          <Row className="my-4">
+            <h6>Source</h6>
             <div style={{minWidth: "100%"}}>
-              <Select isClearable isMulti options={tags} onChange={e => this.updateTags(e.map(x => x.value))} placeholder="Filter by type." />
+              <Select options={SOURCE_TYPES} onChange={e => this.updateSource(e)} value={SOURCE_TYPES.filter((t) => t.value == this.state.source)} placeholder="Choose a source." />
             </div>
-          </Row> */}
+          </Row>
         </Form>
       </Col>
       )

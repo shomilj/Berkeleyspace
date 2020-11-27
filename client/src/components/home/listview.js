@@ -8,9 +8,9 @@ import { selectPost } from "../../redux/actions";
 
 class ListView extends React.Component {
 
-    didSelectPost = (id) => {
+    didSelectPost = (post) => {
         var x = () => {
-            this.props.selectPost(id);
+            this.props.selectPost(post);
         }
         return x;
     }
@@ -21,7 +21,7 @@ class ListView extends React.Component {
                 <div style={{height: "0px"}}>
                     {
                         this.props.posts && this.props.posts.allPosts.length ? this.props.posts.allPosts.map((post) => {
-                            return <Cell key={`post-${post.id}`} title={post.title} datePosted={new Date(post.date).toLocaleDateString("en-US")} onClick={this.didSelectPost(post.id)}/>
+                            return <Cell title={post.title} datePosted={new Date(post.date).toLocaleDateString("en-US")} onClick={this.didSelectPost(post)}/>
                         })
                         : ""
                     }

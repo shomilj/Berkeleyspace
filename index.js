@@ -3,6 +3,9 @@
 const express = require('express');
 const app = express();
 
+/* Add support for fetch. */
+const fetch = require("node-fetch");
+
 /* Heroku uses process.env.PORT */
 const port = process.env.PORT || 8080;
 
@@ -107,7 +110,8 @@ function rowMetadata(row) {
     id: row.id,
     title: row.title,
     date: row.date,
-    upvotes: row.upvotes
+    upvotes: row.upvotes,
+    source: 'piazza'
   }
 }
 
@@ -137,44 +141,7 @@ function searchTitle(question) {
   })
 }
 
-/* -------------- SECTION: Routing ----------------- */
-
-/* Returns post content for a given post. */
-app.post('/content', (req, res) => {
-  var id = req.body.id || '';
-  if (id != '') {
-    for (var i = 0; i < dataset.length; i++) {
-      if (dataset[i].id == id) {
-        res.json(dataset[i]);
-        return;
-      }
-    }
-  }
-})
-
-/* Returns a list of applicable posts' metadata. */
-app.post('/query', (req, res) => {
-
-  /* First, we unwrap and null-check all parameters, setting default values as we go. */
-  var question = req.body.question || '';
-  if (question == null) question = '';
-  question = question.toLowerCase();
-
-  var mode = req.body.mode || 'auto';
-  var sort = req.body.sort || 'auto';
-  var courses = req.body.courses || [];
-  if (typeof courses == 'string' && courses != '') courses = [courses];
-  var professors = req.body.professors || [];
-  if (typeof professors == 'string' && professors != '') professors = [professors];
-  var tags = req.body.tags || [];
-  if (typeof tags == 'string' && tags != '') tags = [tags];
-  
-  /* If no filters were applied and the search query is empty, return an empty dictionary. */
-  if (question == '' && (courses.length + professors.length + tags.length == 0)) {
-    res.json([]);
-    return;
-  }
-
+function queryPiazza(question, courses, professors, tags, mode) {
   /* First, apply our search method. */
   var data = [];
   var isAuto = false;
@@ -203,25 +170,122 @@ app.post('/query', (req, res) => {
 
   /* Then, filter data on courses, professors, and tags. */
   data = filterData(data, question, courses, professors, tags, isAuto);
+  return data;
+}
 
-  /* Then, apply our sort. */
-  switch(sort) {
-    case 'auto':
-      break;
-    case 'upvotes':
-      data.sort(function(a, b) {
-        return (a.upvotes || 0) > (b.upvotes || 0);
-      })
-      break;
-    case 'date':
-      data.sort(function(a, b) {
-        return (a.date > b.date) ? -1 : 1
-      })
-      break;
-    case 'default':
-      break;
+async function queryReddit(question, courses, professors, tags) {
+  var data = [];
+  const response = await fetch('https://www.reddit.com/r/berkeley/search.json?q=' + question + '&restrict_sr=true')
+  const record = await response.json();
+  if (record == null) return [];
+  record.data.children.forEach((row) => {
+    var date = new Date(0);
+    date.setUTCSeconds(row.data.created_utc);
+    data.push({
+      id: row.data.url,
+      title: row.data.title,
+      date: date,
+      upvotes: row.data.ups,
+      permalink: row.data.permalink,
+      source: 'reddit'
+    });
+  })
+  return data;
+}
+
+function sortData(data, sort) {
+    /* Then, apply our sort. */
+    switch(sort) {
+      case 'auto':
+        break;
+      case 'upvotes':
+        data.sort(function(a, b) {
+          return (a.upvotes || 0) > (b.upvotes || 0);
+        })
+        break;
+      case 'date':
+        data.sort(function(a, b) {
+          return (a.date > b.date) ? -1 : 1
+        })
+        break;
+      case 'default':
+        break;
+    }
+    return data;
+}
+
+/* -------------- SECTION: Routing ----------------- */
+
+function returnRedditHits(url, title, res) {
+  res.json({
+    title: title,
+    tags: ['reddit'],
+    content: 'To open this post on Reddit, click ' + '<a href="' + url + '" target="_blank">here.</a>',
+    upvotes: 0,
+    id: url,
+    professors: [],
+    children: [],
+    courses: [],
+    date: new Date().toString()
+  })
+}
+
+/* Returns post content for a given post. */
+app.post('/content', (req, res) => {
+  var id = req.body.id || '';
+  var source = req.body.source || '';
+  var title = req.body.title || '';
+  if (id != '' && source != '') {
+    if (source == 'reddit') {
+      returnRedditHits(id, title, res);
+      return;
+    } else {
+      for (var i = 0; i < dataset.length; i++) {
+        if (dataset[i].id == id) {
+          res.json(dataset[i]);
+          return;
+        }
+      }
+    }
   }
-  res.json(data);
+})
+
+/* Returns a list of applicable posts' metadata. */
+app.post('/query', (req, res) => {
+
+  /* First, we unwrap and null-check all parameters, setting default values as we go. */
+  var question = req.body.question || '';
+  if (question == null) question = '';
+  question = question.toLowerCase();
+
+  var source = req.body.source || 'piazza';
+  var mode = req.body.mode || 'auto';
+  var sort = req.body.sort || 'auto';
+  var courses = req.body.courses || [];
+  if (typeof courses == 'string' && courses != '') courses = [courses];
+  var professors = req.body.professors || [];
+  if (typeof professors == 'string' && professors != '') professors = [professors];
+  var tags = req.body.tags || [];
+  if (typeof tags == 'string' && tags != '') tags = [tags];
+
+  /* If no filters were applied and the search query is empty, return an empty dictionary. */
+  if (question == '' && (courses.length + professors.length + tags.length == 0)) {
+    res.json([]);
+    return;
+  }
+
+  var data = [];
+  if (source == 'piazza') {
+    data = queryPiazza(question, courses, professors, tags, mode);
+    data = sortData(data, sort);
+    res.json(data);
+  } else if (source == 'reddit') {
+     queryReddit(question, courses, professors, tags).then(records => {
+       data = records;
+       sortData(data, sort);
+       res.json(data);
+    });
+  }
 })
 
 app.use(express.static('client/build'))

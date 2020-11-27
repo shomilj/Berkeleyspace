@@ -14,10 +14,10 @@ export const updateSearch = filters => {
     }
 }
 
-export const selectPost = id => {
+export const selectPost = (post) => {
     const base = window.location.hostname === 'localhost' ? 'http://localhost:8080/' : '/'
     return (dispatch) => {
-        fetch(base + 'content', {method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({'id': id})})
+        fetch(base + 'content', {method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(post)})
         .then(data => data.json())
         .then(content => {
             dispatch({
