@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { getPosts } from "../../redux/selectors";
 
 import { selectPost } from "../../redux/actions";
+import windowSize from 'react-window-size';
 
 class ListView extends React.Component {
 
@@ -17,7 +18,8 @@ class ListView extends React.Component {
 
     render() {
         return (
-            <Col style={{height: "90vh", maxWidth: "25%", minWidth: "200px", overflowY: "auto", borderRight: "0.1px solid #ecf0f1", borderLeft: "0.1px solid #ecf0f1"}}>
+            <Col style={this.props.windowWidth < 400 ? {height: "30vh", maxWidth: "100%", minWidth: "100%", marginTop: "30px", marginBottom: "30px", overflowY: "auto", borderLeft: "0.1px solid #ecf0f1"}
+                            : {height: "90vh", maxWidth: "25%", minWidth: "200px", overflowY: "auto", borderRight: "0.1px solid #ecf0f1", borderLeft: "0.1px solid #ecf0f1"}}>
                 <div style={{height: "0px"}}>
                     {
                         this.props.posts && this.props.posts.allPosts.length ? this.props.posts.allPosts.map((post) => {
@@ -40,4 +42,4 @@ const mapStateToProps = state => {
 export default connect(
     mapStateToProps,
     { selectPost }
-)(ListView);
+)(windowSize(ListView));

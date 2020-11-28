@@ -2,6 +2,7 @@ import * as React from "react";
 import { Row, Col, Card, Badge } from "react-bootstrap";
 import { connect } from "react-redux";
 import { getSelectedPost } from "../../redux/selectors";
+import windowSize from 'react-window-size';
 
 /* The DetailView component is the component that displays detailed information about a post,
     including the post content and followups. */
@@ -143,7 +144,7 @@ class DetailView extends React.Component {
 
   render() {
     return (
-      <Col className="m-1" style={{ overflowY: "auto", height: "90vh" }}>
+      <Col className="m-1" style={this.props.windowWidth < 400 ? { overflowY: "auto"} : { overflowY: "auto", height: "90vh" }}>
         {this.props.selectedPost ? this.postPage() : this.emptyPage()}
       </Col>
     );
@@ -155,4 +156,4 @@ const mapStateToProps = (state) => {
   return { selectedPost: selectedPost };
 };
 
-export default connect(mapStateToProps)(DetailView);
+export default connect(mapStateToProps)(windowSize(DetailView));

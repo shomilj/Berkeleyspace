@@ -2,6 +2,7 @@
 import { Row, Col, Form } from 'react-bootstrap';
 import { connect } from "react-redux";
 import { updateSearch } from "../../redux/actions";
+import windowSize from 'react-window-size';
 
 import ReactGA from 'react-ga';
 import * as React from 'react';
@@ -87,7 +88,8 @@ class FilterBox extends React.Component {
 
   render() {
     return (
-      <Col style={{height: "90vh", maxWidth: "25%", minWidth: "200px",  overflowY: "auto", borderLeft: "0.1px solid #ecf0f1"}}>
+      <Col style={this.props.windowWidth < 400 ? {maxWidth: "100%", minWidth: "100%",  overflowY: "auto", borderLeft: "0.1px solid #ecf0f1"} : 
+                  {height: "90vh", maxWidth: "25%", minWidth: "200px",  overflowY: "auto", borderLeft: "0.1px solid #ecf0f1"}}>
         <Form className="m-3">
           <Row className="my-4">
             <h5>Filters</h5>
@@ -134,4 +136,4 @@ class FilterBox extends React.Component {
 export default connect(
   null,
   { updateSearch }
-)(FilterBox);
+)(windowSize(FilterBox));
