@@ -8,4 +8,4 @@ One of the biggest bottlenecks on this forum - something that applies to Piazza 
 
 EECS 101 is a site that indexes content from EECS 101 and serves it in a clean format with robust search & filter capabilities. Below, I walk through the process of approaching this.
 
-**Read More: ** https://shomil.me/eecs-101/
+**Read More:** https://shomil.me/eecs-101/
