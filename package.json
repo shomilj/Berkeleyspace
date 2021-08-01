@@ -4,18 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "heroku-postbuild": "cd client && npm install && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "nodemon index.js",
+    "client": "npm start --prefix client",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "concurrently": "^6.2.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "fuse.js": "^6.4.3",
     "heroku-ssl-redirect": "^0.1.1",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "nodemon": "^2.0.12"
   }
 }
