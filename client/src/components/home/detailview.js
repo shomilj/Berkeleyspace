@@ -21,8 +21,10 @@ class DetailView extends React.Component {
     return (
       <div>
         {this.props.loadingDetail ? (
-          <div style={{ height: "1005" }} className="justify-content-md-center">
-          </div>
+          <div
+            style={{ height: "1005" }}
+            className="justify-content-md-center"
+          ></div>
         ) : (
           <div>
             <Row className="m-1">
@@ -71,6 +73,12 @@ class DetailView extends React.Component {
                   {new Date(this.props.selectedPost.date).toLocaleDateString(
                     "en-US"
                   )}
+                  . See {" "}
+                  {
+                    <a href={"https://piazza.com/class/hyq0br1u3kx7dg?cid=" + this.props.selectedPost.id}>
+                      original
+                    </a>
+                  }
                   .
                 </p>
               ) : (
